@@ -6,6 +6,9 @@ build:
 server:
 	python -m http.server
 
+server3:
+	python3 -m http.server
+
 dist:
 	mkdir -p dist/
 	rm dist/*.zip
