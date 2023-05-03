@@ -1,0 +1,2 @@
+[build]
+rustflags = ["--remap-path-prefix","/home/fasciano/=/root/","--remap-path-prefix","/home/fasciano/Programmation/Rust/=/root/"]
