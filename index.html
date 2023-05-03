@@ -6,25 +6,17 @@
 
 <style>
 </style>
-<script>
-function update_board(s) {
-    var element = document.getElementById("board");
-    element.innerText = s;
-}
-</script>    
 <script type="module">
 import init, { web_ai_wargame } from "./pkg/ai_wargame_wasm.js";
 init().then(() => {
-    update_board("init");
     web_ai_wargame();
 });
 </script>
 </head>
 
 <body>
-    <div id="board-parent">
-        <pre id="board"></pre>
-    </div>
+<p>Please open your web browser console to see the output of an automated game.</p>
+<p>In Chrome: Ctrl-Shift-I, then click on the Console tab.</p>
 </body>
 
 </html>
