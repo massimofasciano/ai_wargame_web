@@ -8,9 +8,9 @@ server:
 
 dist:
 	mkdir -p dist/
+	rm dist/*.zip
 	cp index.html dist/
 	mkdir -p dist/pkg
-	cp pkg/*.wasm pkg/*.js dist/pkg/
-	cd dist; zip -9r ai_wargame_web.zip index.html pkg
+	cp pkg/ai_wargame_web_console_bg.wasm pkg/ai_wargame_web_console.js dist/pkg/
+	cd dist; zip -9r ai_wargame_web_console.zip index.html pkg
 	rm -rf dist/index.html dist/pkg
-	
