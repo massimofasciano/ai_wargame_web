@@ -1,5 +1,4 @@
-use std::io::Write;
-
+use std::io::Write as IoWrite;
 use wasm_bindgen::prelude::*;
 
 use ai_wargame::{Game, heuristics, GameOptions};
@@ -26,16 +25,15 @@ fn update_board(s: &str) {
     // let document = window.document().expect("should have a document on window");
     // let element = document.get_element_by_id("board").expect("should find board");
     // element.set_text_content(Some(s));
-    update_board_js(s);
+    
+    // update_board_js(s);
 }
 
 #[wasm_bindgen]
 pub fn web_ai_wargame() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    update_board("Hello");
-
-    // return;
+    update_board("init from rust");
 
     let mut options = GameOptions::default();
     options.max_depth = Some(6);
@@ -67,16 +65,12 @@ pub fn web_ai_wargame() {
     }
 }
 
+
 pub fn computer_play_turn(game: &mut Game) {
-    let (score,best_action,elapsed_seconds,avg_depth) = game.suggest_action();
-    if let Some(best_action) = best_action {
-        if let Ok((player, action, outcome)) = game.play_turn_from_action(best_action) {
-        } else {
-            panic!("play turn should work");
-        }
-    } else {
-        game.set_deadlock(true);
-    }
+    let mut buffer = Vec::new();
+    game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
+    buffer.flush().unwrap();
+    console_log!("{}",String::from_utf8_lossy(&buffer));
 }
 
 pub fn pretty_print(game: &Game) {
