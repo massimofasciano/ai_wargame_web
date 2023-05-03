@@ -2,57 +2,40 @@ use std::io::Write;
 
 use wasm_bindgen::prelude::*;
 
-use ai_wargame::{Game, heuristics, GameOptions, IsUsefulInfo, Coord};
+use ai_wargame::{Game, heuristics, GameOptions};
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-
-    // The `console.log` is quite polymorphic, so we can bind it with multiple
-    // signatures. Note that we need to use `js_name` to ensure we always call
-    // `log` in JS.
     #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-
-    // Multiple arguments too!
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
+    fn console_log(s: &str);
+    #[wasm_bindgen(js_namespace = document, js_name = write)]
+    fn document_write(s: &str);
+    #[wasm_bindgen(js_name = update_board)]
+    fn update_board_js(s: &str);
 }
 
-macro_rules! wprintln {
-    ($($t:tt)*) => (doc_string(format!("{}\n",format_args!($($t)*).to_string())).unwrap())
-}
-macro_rules! wprint {
-    ($($t:tt)*) => (doc_string(format_args!($($t)*).to_string()).unwrap())
+macro_rules! console_log {
+    ($($t:tt)*) => (console_log(&format_args!($($t)*).to_string()))
 }
 
-fn doc_string(s: String) -> Result<(), JsValue> {
-    // Use `web_sys`'s global `window` function to get a handle on the global
-    // window object.
-    let window = web_sys::window().expect("no global `window` exists");
-    let document = window.document().expect("should have a document on window");
-    let body = document.body().expect("document should have a body");
-
-    body.set_inner_text(s.as_str());
-
-    // Manufacture the element we're gonna append
-    // let val = document.create_element("span")?;
-    // val.set_text_content(Some(s.as_str()));
-
-    // body.append_child(&val)?;
-
-    Ok(())
+fn update_board(s: &str) {
+    // let window = web_sys::window().expect("no global `window` exists");
+    // let document = window.document().expect("should have a document on window");
+    // let element = document.get_element_by_id("board").expect("should find board");
+    // element.set_text_content(Some(s));
+    update_board_js(s);
 }
 
 #[wasm_bindgen]
 pub fn web_ai_wargame() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+
+    update_board("Hello");
+
+    // return;
 
     let mut options = GameOptions::default();
     options.max_depth = Some(6);
@@ -68,16 +51,15 @@ pub fn web_ai_wargame() {
     options.mutual_damage = true;
     options.move_only_forward = true;
     options.adjust_max_depth = true;
+    options.debug = true;
        
     let mut game = Game::new(options);
 
     loop {
-        wprintln!("");
         pretty_print(&game);
-        wprintln!("");
 
         if let Some(winner) = game.end_game_result() {
-            log(&format!("{} wins in {} moves!", winner, game.total_moves()));
+            console_log!("{} wins in {} moves!", winner, game.total_moves());
             break;
         }
 
@@ -101,9 +83,12 @@ pub fn pretty_print(game: &Game) {
     let mut buffer = Vec::new();
     game.pretty_print_info(&mut buffer).expect("should work in a vec buffer");
     buffer.flush().unwrap();
-    log(&String::from_utf8_lossy(&buffer));
+    let info = String::from_utf8_lossy(&buffer);
+    console_log!("{}",info);
     buffer.clear();
     game.pretty_print_board(&mut buffer).expect("should work in a vec buffer");
     buffer.flush().unwrap();
-    wprintln!("{}",String::from_utf8_lossy(&buffer));
+    let board = String::from_utf8_lossy(&buffer);
+    console_log!("{}",board);
+    update_board(board.as_ref());
 }

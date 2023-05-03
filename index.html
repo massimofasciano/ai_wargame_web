@@ -2,34 +2,29 @@
 <html lang="en-US">
 <head>
 <meta charset="utf-8" />
-<title>loterie-wasm example</title>
+<title>AI Wargame</title>
 
 <style>
-table {
-    border-collapse: collapse;
-}
-table, th, td {
-    background-color: linen;
-    border: 1px solid black;
-}
-td {
-    width: 100px;
-    text-align: center;
-    color: maroon;
-    font-size:300%;
-}
 </style>
-
+<script>
+function update_board(s) {
+    var element = document.getElementById("board");
+    element.innerText = s;
+}
+</script>    
 <script type="module">
 import init, { web_ai_wargame } from "./pkg/ai_wargame_wasm.js";
 init().then(() => {
+    update_board("init");
     web_ai_wargame();
 });
 </script>
 </head>
 
 <body>
-  <div name="output"></div>
+    <div id="board-parent">
+        <pre id="board"></pre>
+    </div>
 </body>
 
 </html>
