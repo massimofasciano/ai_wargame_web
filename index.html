@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8" />
+<title>loterie-wasm example</title>
+
+<style>
+table {
+    border-collapse: collapse;
+}
+table, th, td {
+    background-color: linen;
+    border: 1px solid black;
+}
+td {
+    width: 100px;
+    text-align: center;
+    color: maroon;
+    font-size:300%;
+}
+</style>
+
+<script type="module">
+import init, { web_ai_wargame } from "./pkg/ai_wargame_wasm.js";
+init().then(() => {
+    web_ai_wargame();
+});
+</script>
+</head>
+
+<body>
+  <div name="output"></div>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"command": "build",
+			"args": [
+				"--release"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": {
+				"kind": "build"
+			},
+			"label": "rust: cargo build --release"
+		},
+		{
+			"type": "shell",
+			"command": "wasm-pack",
+			"args": [
+				"build","--target","web"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "rust: wasm-pack build --target web"
+		},
+		{
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m","http.server"
+			],
+			"label": "python web server"
+		},
+		{
+			"type": "cargo",
+			"command": "run",
+			"args": [
+				"--release"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"label": "rust: cargo run --release"
+		}
+	]
+}
