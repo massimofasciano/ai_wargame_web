@@ -5,18 +5,74 @@
 <title>AI Wargame</title>
 
 <style>
+:root {
+    background-color: black;
+    width: 665px;
+}
+#board {
+    background-color: yellow;
+    font-size: 48px;
+    /* width: 665px; */
+    border: 3px solid green;
+}
+#info {
+    color: greenyellow;
+    font-size: 12px;
+    border: 3px solid green;
+    height: 120px;
+}
+#stats {
+    color: orange;
+    font-size: 16px;
+    border: 3px solid green;
+    height: 100px;
+}
 </style>
+<script>
+function show_board(game) {
+    let game_board = game.board_string();
+    document.getElementById("board").innerText=game_board;
+    console.log(game_board);
+}
+function show_info(game) {
+    let game_info = game.info_string();
+    document.getElementById("info").innerText=game_info;
+    console.log(game_info);
+}
+function show_stats(stats) {
+    document.getElementById("stats").innerText=stats;
+    console.log(stats);
+}
+function game_iteration(game) {
+    let win_message = game.has_winner();
+    if (win_message == undefined) {
+        let stats = game.computer_play_turn();
+        show_stats(stats);
+        show_info(game);
+        show_board(game);
+        setTimeout(() => game_iteration(game), 0);
+    } else {
+        show_stats(win_message);
+    }
+}
+</script>
 <script type="module">
-import init, { web_ai_wargame } from "./pkg/ai_wargame_web_console.js";
+import init, { WebGame } from "./pkg/ai_wargame_web.js";
 init().then(() => {
-    web_ai_wargame();
+    let game = new WebGame();
+    show_board(game);
+    setTimeout(() => game_iteration(game), 0);
 });
 </script>
 </head>
 
 <body>
-<p>Please open your web browser console to see the output of an automated game.</p>
-<p>In Chrome: Ctrl-Shift-I, then click on the Console tab.</p>
+    <pre id="info">
+    </pre>
+    <pre id="board">
+    </pre>
+    <pre id="stats">
+    </pre>
 </body>
 
 </html>
