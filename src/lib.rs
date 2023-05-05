@@ -54,15 +54,16 @@ impl WebGame {
     pub fn info_string(&self) -> String {
         let mut buffer = Vec::new();
         self.game.pretty_print_info(&mut buffer).expect("should work in a vec buffer");
-        // buffer.flush().unwrap();
         String::from_utf8_lossy(&buffer).to_string()
 
     }
     pub fn board_string(&self) -> String {
         let mut buffer = Vec::new();
         self.game.pretty_print_board(&mut buffer).expect("should work in a vec buffer");
-        // buffer.flush().unwrap();
         String::from_utf8_lossy(&buffer).to_string()
+    }
+    pub fn html_string(&self, css_class: String) -> String {
+        self.game.to_html_board_string(css_class)
     }
     pub fn has_winner(&self) -> Option<String> {
         if let Some(winner) = self.game.end_game_result() {
@@ -74,7 +75,6 @@ impl WebGame {
     pub fn computer_play_turn(&mut self) -> String {
         let mut buffer = Vec::new();
         self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
-        // buffer.flush().unwrap();
         String::from_utf8_lossy(&buffer).to_string()
     }
 }
