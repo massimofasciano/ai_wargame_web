@@ -70,8 +70,22 @@
 }
 </style>
 <script>
+var game;
+function mouse_clicked(row, col) {
+    console.log("Clicked at row:",row," col:",col);
+    if (mouse_clicked.first == undefined ) {
+        mouse_clicked.first = [row,col];
+    } else {
+        let to = [row,col];
+        let from = mouse_clicked.first;
+        mouse_clicked.first = undefined;
+        let output = game.player_play_turn(from[0],from[1],to[0],to[1]);
+        console.log(output);
+        show_board(game);
+    }
+}
 function show_board(game) {
-    let game_html = game.html_string("board");
+    let game_html = game.html_string("board","mouse_clicked");
     document.getElementById("board").innerHTML=game_html;
     // let game_board = game.board_string();
     // console.log(game_board);
@@ -108,9 +122,9 @@ function game_iteration(game) {
 <script type="module">
 import init, { WebGame } from "./pkg/ai_wargame_web.js";
 init().then(() => {
-    let game = new WebGame();
+    game = new WebGame();
     show_board(game);
-    setTimeout(() => game_iteration(game), 0);
+    // setTimeout(() => game_iteration(game), 0);
 });
 </script>
 </head>
