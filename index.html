@@ -73,18 +73,24 @@
 function show_board(game) {
     let game_html = game.html_string("board");
     document.getElementById("board").innerHTML=game_html;
-    let game_board = game.board_string();
-    console.log(game_board);
+    // let game_board = game.board_string();
+    // console.log(game_board);
     // console.log(game_html);
 }
 function show_info(game) {
     let game_info = game.info_string();
     document.getElementById("info").innerText=game_info;
-    console.log(game_info);
+    // console.log(game_info);
 }
 function show_stats(stats) {
     document.getElementById("stats").innerText=stats;
-    console.log(stats);
+    // console.log(stats);
+}
+function show_winner(win_message) {
+    show_stats(win_message);
+    for (let element of document.getElementsByClassName("board_info_moves")) {
+        element.innerText=win_message;
+    }
 }
 function game_iteration(game) {
     let win_message = game.has_winner();
@@ -95,7 +101,7 @@ function game_iteration(game) {
         show_board(game);
         setTimeout(() => game_iteration(game), 0);
     } else {
-        show_stats(win_message);
+        show_winner(win_message);
     }
 }
 </script>
