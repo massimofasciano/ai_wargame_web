@@ -23,6 +23,7 @@ pub fn main() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
+#[derive(Debug,Clone,Default)]
 pub struct WebGame {
     game: Game
 }
@@ -77,16 +78,16 @@ impl WebGame {
         self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
     }
-    pub fn player_play_turn(&mut self, from_row: Dim, from_col: Dim, to_row: Dim, to_col: Dim) -> String {
+    pub fn player_play_turn(&mut self, from_row: Dim, from_col: Dim, to_row: Dim, to_col: Dim) -> Option<String> {
         let from = Coord::from_tuple((from_row,from_col));
         let to = Coord::from_tuple((to_row,to_col));
         console_log!("User entered move from {from} to {to}");
         let mut buffer = Vec::new();
-        let valid = self.game.human_play_turn_from_coords(Some(&mut buffer),from,to).expect("should work in a vec buffer");
-        if !valid {
-            format!("Invalid move from {from} to {to}")
+        if self.game.human_play_turn_from_coords(Some(&mut buffer),from,to).expect("should work in a vec buffer") {
+            Some(String::from_utf8_lossy(&buffer).to_string())
         } else {
-            String::from_utf8_lossy(&buffer).to_string()
+            console_log!("Invalid move from {from} to {to}");
+            None
         }
     }
 }

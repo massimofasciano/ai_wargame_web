@@ -7,6 +7,7 @@
 <style>
 :root {
     background-color: black;
+    color: white;
 }
 /* #board {
 } */
@@ -70,35 +71,52 @@
 }
 </style>
 <script>
-var game;
-function mouse_clicked(row, col) {
+var game; // making this global for the HTML onclick functions
+function computer_next_move() {
+    setTimeout(() => game_iteration_computer(game, false), 0);
+}
+function computer_all_moves() {
+    document.getElementById("buttons").innerHTML="";
+    setTimeout(() => game_iteration_computer(game, true), 0);
+}
+function player_next_move(row, col) {
     console.log("Clicked at row:",row," col:",col);
-    if (mouse_clicked.first == undefined ) {
-        mouse_clicked.first = [row,col];
+    if (player_next_move.first == undefined ) {
+        player_next_move.first = [row,col];
     } else {
         let to = [row,col];
-        let from = mouse_clicked.first;
-        mouse_clicked.first = undefined;
-        let output = game.player_play_turn(from[0],from[1],to[0],to[1]);
-        console.log(output);
-        show_board(game);
+        let from = player_next_move.first;
+        player_next_move.first = undefined;
+        let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
+        if (result != undefined) {
+            show_board(game);
+            show_stats(result);
+            check_winner(() => game_iteration_computer(game, false));
+        } else {
+            let message = "Invalid move!";
+            show_winner(message);
+            show_stats(message);            
+        }
+    }
+}
+function check_winner(next_step) {
+    let win_message = game.has_winner();
+    if (win_message == undefined) {
+        setTimeout(() => next_step(), 0);
+    } else {
+        show_winner(win_message);
     }
 }
 function show_board(game) {
-    let game_html = game.html_string("board","mouse_clicked");
+    let game_html = game.html_string("board","player_next_move");
     document.getElementById("board").innerHTML=game_html;
-    // let game_board = game.board_string();
-    // console.log(game_board);
-    // console.log(game_html);
 }
 function show_info(game) {
     let game_info = game.info_string();
     document.getElementById("info").innerText=game_info;
-    // console.log(game_info);
 }
 function show_stats(stats) {
     document.getElementById("stats").innerText=stats;
-    // console.log(stats);
 }
 function show_winner(win_message) {
     show_stats(win_message);
@@ -106,17 +124,16 @@ function show_winner(win_message) {
         element.innerText=win_message;
     }
 }
-function game_iteration(game) {
-    let win_message = game.has_winner();
-    if (win_message == undefined) {
-        let stats = game.computer_play_turn();
-        show_stats(stats);
-        show_info(game);
-        show_board(game);
-        setTimeout(() => game_iteration(game), 0);
-    } else {
-        show_winner(win_message);
-    }
+function game_iteration_computer(game, auto) {
+    let stats = game.computer_play_turn();
+    show_stats(stats);
+    show_info(game);
+    show_board(game);
+    check_winner(() => {
+        if (auto) {
+            game_iteration_computer(game, auto);
+        }
+    });
 }
 </script>
 <script type="module">
@@ -124,14 +141,19 @@ import init, { WebGame } from "./pkg/ai_wargame_web.js";
 init().then(() => {
     game = new WebGame();
     show_board(game);
-    // setTimeout(() => game_iteration(game), 0);
 });
 </script>
 </head>
 
 <body>
+    Click on a source cell and then on a destination cell to perform a move. <br>
     <div id="board">
     </div>
+    <button onclick="location.reload()">Restart game</button>
+    <span id="buttons">
+        <button onclick="computer_next_move()">Computer plays next move</button>
+        <button onclick="computer_all_moves()">Computer plays all moves</button>
+    </span>
     <pre id="stats">
     </pre>
     <pre id="info">
