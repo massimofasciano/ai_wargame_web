@@ -77,6 +77,7 @@ function computer_next_move() {
 }
 function computer_all_moves() {
     document.getElementById("buttons").innerHTML="";
+    document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
     setTimeout(() => game_iteration_computer(game, true), 0);
 }
 var player_next_move_first_coord = undefined; // making this global for the HTML onclick functions
@@ -155,7 +156,7 @@ init().then(() => {
 </head>
 
 <body>
-    Click on a source cell and then on a destination cell to perform a move. <br>
+    <div id="instructions">Click on a source cell and then on a destination cell to perform a move.</div><br>
     <div id="board">
     </div>
     <button onclick="location.reload()">Restart game</button>
