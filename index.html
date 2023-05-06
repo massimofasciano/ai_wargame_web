@@ -79,14 +79,23 @@ function computer_all_moves() {
     document.getElementById("buttons").innerHTML="";
     setTimeout(() => game_iteration_computer(game, true), 0);
 }
+var player_next_move_first_coord = undefined; // making this global for the HTML onclick functions
+function cancel_move() {
+    player_next_move_first_coord = undefined;
+    document.getElementById("cancel-move").innerHTML="";
+}
 function player_next_move(row, col) {
     console.log("Clicked at row:",row," col:",col);
-    if (player_next_move.first == undefined ) {
-        player_next_move.first = [row,col];
+    if (player_next_move_first_coord == undefined ) {
+        player_next_move_first_coord = [row,col];
+        document.getElementById("cancel-move").innerHTML=
+            "<button onclick=\"cancel_move()\">Cancel move from ("+
+                player_next_move_first_coord[0]+","+player_next_move_first_coord[1]+
+            ")</button>";
     } else {
         let to = [row,col];
-        let from = player_next_move.first;
-        player_next_move.first = undefined;
+        let from = player_next_move_first_coord;
+        cancel_move();
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
             show_board(game);
@@ -154,6 +163,7 @@ init().then(() => {
         <button onclick="computer_next_move()">Computer plays next move</button>
         <button onclick="computer_all_moves()">Computer plays all moves</button>
     </span>
+    <span id="cancel-move"></span>
     <pre id="stats">
     </pre>
     <pre id="info">
