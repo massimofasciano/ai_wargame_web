@@ -69,9 +69,26 @@
     white-space: pre-wrap;
     word-break: break-all;
 }
+.stats-table {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 16px;
+    color: #555;
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+.stats-table td {
+    border: 1px solid #ddd;
+}
+.stats-table th {
+    border: 1px solid #ddd;
+}
 </style>
 <script>
 var game; // making this global for the HTML onclick functions
+var coord_string;
 function computer_next_move() {
     setTimeout(() => game_iteration_computer(game, false), 0);
 }
@@ -90,9 +107,9 @@ function player_next_move(row, col) {
     if (player_next_move_first_coord == undefined ) {
         player_next_move_first_coord = [row,col];
         document.getElementById("cancel-move").innerHTML=
-            "<button onclick=\"cancel_move()\">Cancel move from ("+
-                player_next_move_first_coord[0]+","+player_next_move_first_coord[1]+
-            ")</button>";
+            "<button onclick=\"cancel_move()\">Cancel move from "+
+                coord_string(player_next_move_first_coord)
+            +"</button>";
     } else {
         let to = [row,col];
         let from = player_next_move_first_coord;
@@ -121,6 +138,15 @@ function show_board(game) {
     let game_html = game.html_string("board","player_next_move");
     document.getElementById("board").innerHTML=game_html;
 }
+function show_damage_table(game) {
+    let table_html = game.damage_table_string("from / to");
+    document.getElementById("damage-table").innerHTML=table_html;
+    console.log(table_html);
+}
+function show_repair_table(game) {
+    let table_html = game.repair_table_string("from / to");
+    document.getElementById("repair-table").innerHTML=table_html;
+}
 function show_info(game) {
     let game_info = game.info_string();
     document.getElementById("info").innerText=game_info;
@@ -148,9 +174,14 @@ function game_iteration_computer(game, auto) {
 </script>
 <script type="module">
 import init, { WebGame } from "./pkg/ai_wargame_web.js";
+coord_string = (coord) => {
+    return WebGame.display_coord(coord[0],coord[1]);
+}
 init().then(() => {
     game = new WebGame();
     show_board(game);
+    show_damage_table(game);
+    show_repair_table(game);
 });
 </script>
 </head>
@@ -165,6 +196,27 @@ init().then(() => {
         <button onclick="computer_all_moves()">Computer plays all moves</button>
     </span>
     <span id="cancel-move"></span>
+    <br>
+    <table>
+    <tr>
+    <td>
+    Damage table:<br>
+    <div id="damage-table">
+    </div>
+    </td>
+    <td>
+    Repair table:<br>
+    <div id="repair-table">
+    </div>
+    </td>
+    <td>
+    <div>
+    Self-destruct applies 2 points of damage to any adjacent unit (including diagonals and friendlies).
+    </div>
+    </td>
+    </tr>
+    </table>
+    <br>
     <pre id="stats">
     </pre>
     <pre id="info">

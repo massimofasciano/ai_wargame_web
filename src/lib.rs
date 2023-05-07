@@ -47,6 +47,12 @@ impl WebGame {
         self.game.pretty_print_board(&mut buffer).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
     }
+    pub fn damage_table_string(&self, legend: &str) -> String {
+        self.game.html_damage_table_string(Some(legend))
+    }
+    pub fn repair_table_string(&self, legend: &str) -> String {
+        self.game.html_repair_table_string(Some(legend))
+    }
     pub fn html_string(&self, css_class: String, fn_click: String) -> String {
         self.game.to_html_board_string(css_class, fn_click)
     }
@@ -61,6 +67,10 @@ impl WebGame {
         let mut buffer = Vec::new();
         self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
+    }
+    pub fn display_coord(from_row: Dim, from_col: Dim) -> String {
+        let from = Coord::from_tuple((from_row,from_col));
+        from.to_string()
     }
     pub fn player_play_turn(&mut self, from_row: Dim, from_col: Dim, to_row: Dim, to_col: Dim) -> Option<String> {
         let from = Coord::from_tuple((from_row,from_col));
