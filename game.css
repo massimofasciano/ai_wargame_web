@@ -2,10 +2,10 @@
     background-color: black;
     color: white;
 }
-/* #board {
-} */
+#game {
+    width: 100%;
+}
 .board {
-    /* table-layout: fixed; */
     border-collapse: collapse;
     background-color: #f2f2f2;
     font-family: Arial, sans-serif;
@@ -14,11 +14,11 @@
     border: 1px solid #ddd;
     text-align: center;
     vertical-align: middle;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     color: #555;
     padding: 10px;
-    width: 120px;
+    width: 100px;
     height: 60px;
 }
 .board_cell:hover {
@@ -28,7 +28,7 @@
     background-color: #5d88b7;
     color: #fff;
     padding: 10px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
 }
@@ -46,21 +46,25 @@
 .board_Defender {
     background-color: #3e94aa;
 }
+#trace {
+    color: #555;
+    background-color: #f2f2f2;
+}
 #info {
-    color: greenyellow;
+    color: #555;
+    background-color: #f2f2f2;
     font-size: 12px;
-    /* border: 3px solid green; */
-    height: 140px;
+    height: 160px;
+    width: 300px;
     white-space: pre-wrap;
-    word-break: break-all;
 }
 #stats {
-    color: orange;
+    color: #555;
+    background-color: #f2f2f2;
     font-size: 16px;
-    /* border: 3px solid green; */
-    height: 100px;
+    height: 160px;
+    width: 300px;
     white-space: pre-wrap;
-    word-break: break-all;
 }
 .stats-table {
     border: 1px solid #ddd;
@@ -77,4 +81,18 @@
 }
 .stats-table th {
     border: 1px solid #ddd;
+}
+#damage-table {
+    width: 300px;
+}
+#repair-table {
+    width: 300px;
+}
+#self-destruct-help {
+    width: 300px;
+    white-space: pre-wrap;
+}
+#buttons {
+    width: 660px;
+    height: 30px;
 }

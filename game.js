@@ -29,7 +29,7 @@ function computer_next_move() {
 }
 
 function computer_all_moves() {
-    document.getElementById("buttons").innerHTML="";
+    document.getElementById("control-buttons").innerHTML="";
     document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
     setTimeout(() => game_iteration_computer(window.game, true), 0);
 }

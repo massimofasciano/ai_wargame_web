@@ -9,41 +9,48 @@
 </head>
 
 <body>
-    <div id="instructions">Click on a source cell and then on a destination cell to perform a move.</div><br>
-    <div id="board">
+<div id="game">
+    <div id="board-group">
+    <div id="instructions">Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.</div><br>
+    <div id="board"></div>
+    <div id="buttons">
+        <button onclick="location.reload()">Restart game</button>
+        <span id="control-buttons">
+            <button onclick="window.computer_next_move()">Computer plays next move</button>
+            <button onclick="window.computer_all_moves()">Computer plays all moves</button>
+            <span id="auto-reply"></span>
+        </span>
+        <span id="cancel-move"></span>
     </div>
-    <button onclick="location.reload()">Restart game</button>
-    <span id="buttons">
-        <button onclick="window.computer_next_move()">Computer plays next move</button>
-        <button onclick="window.computer_all_moves()">Computer plays all moves</button>
-        <span id="auto-reply"></span>
-    </span>
-    <span id="cancel-move"></span>
     <br>
+    </div>
+
+    <div id="stats-group">
     <table>
     <tr>
-    <td>
-    Damage table:<br>
-    <div id="damage-table">
-    </div>
+    <td valign="top">Damage table:<br>
+    <div id="damage-table"></div>
     </td>
-    <td>
-    Repair table:<br>
-    <div id="repair-table">
-    </div>
-    </td>
-    <td>
-    <div>
-    Self-destruct applies 2 points of damage to any adjacent unit (including diagonals and friendlies).
-    </div>
+    <td valign="top">Repair table:<br>
+    <div id="repair-table"></div>
+    <br>
+    <div id="self-destruct-help">Self-destruct: 2 pts damage to any adjacent unit (incl. diagonals and friendlies).</div>
     </td>
     </tr>
     </table>
     <br>
-    <pre id="stats">
-    </pre>
-    <pre id="info">
-    </pre>
+    </div>
+
+    <div id="trace-group">
+    Debug trace:<br>
+    <table id="trace">
+    <tr>
+    <td valign="top"><pre id="stats"></pre></td>
+    <td valign="top"><pre id="info"></pre></td>
+    </tr>
+    </table>
+    </div>
+</div>
 </body>
 
 </html>
