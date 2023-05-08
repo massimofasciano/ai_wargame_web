@@ -14,8 +14,8 @@ server3:
 dist:
 	mkdir -p dist/
 	rm dist/*.zip
-	cp index.html dist/
+	cp index.html game.js game.css dist/
 	mkdir -p dist/pkg
 	cp pkg/$(package)_bg.wasm pkg/$(package).js dist/pkg/
-	cd dist; zip -9r $(package).zip index.html pkg
-	rm -rf dist/index.html dist/pkg
+	cd dist; zip -9r $(package).zip index.html game.js game.css pkg
+	rm -rf dist/index.html dist/game.js dist/game.css dist/pkg
