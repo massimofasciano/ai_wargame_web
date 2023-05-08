@@ -10,49 +10,37 @@ function new_game() {
     // from HTML via the window object
     window.game = game;
     window.player_next_move = player_next_move;
-    window.computer_next_move = computer_next_move;
-    window.cancel_move = cancel_move;
-    window.computer_all_moves = computer_all_moves;
     window.auto_reply = true;
-    window.disable_auto_reply = disable_auto_reply;
-    window.enable_auto_reply = enable_auto_reply;
+    window.game_over=false;
     // start the game
     show_board(game);
     enable_auto_reply();
     options_setup(game);
     show_damage_table(game);
     show_repair_table(game);
-    document.getElementById("restart").onclick = new_game;
-    document.getElementById("instructions").innerHTML="Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.";
-    document.getElementById('control-buttons').hidden = false;
-}
-
-//
-// these definitions are used directly from global scope in HTML
-// they get their data from the window object when required
-//
-
-function computer_next_move() {
-    setTimeout(() => game_iteration_computer(window.game, false), 0);
-}
-
-function computer_all_moves() {
-    document.getElementById('control-buttons').hidden = true;
-    document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
-    setTimeout(() => game_iteration_computer(window.game, true), 0);
+    setup_buttons(game);
 }
 
 // player_next_move and cancel_move use this variable
 var player_next_move_first_coord = undefined; 
 
+// this function is called from HTML via window.player_next_move
+// and uses window.game and window.auto_reply
 function player_next_move(row, col) {
     console.log("Clicked at row:",row," col:",col);
+    if (window.game_over) {
+        let message = "Game is already finished!";
+        show_stats(message);
+        console.log(message);
+        return;
+    }
     if (player_next_move_first_coord == undefined ) {
         player_next_move_first_coord = [row,col];
         document.getElementById("cancel-move").innerHTML=
-            "<button onclick=\"window.cancel_move()\">Cancel move from "+
+            "<button>Cancel move from "+
                 coord_string(player_next_move_first_coord)
             +"</button>";
+        document.getElementById("cancel-move").onclick=cancel_move;
     } else {
         let game = window.game;
         let to = [row,col];
@@ -75,6 +63,22 @@ function player_next_move(row, col) {
     }
 }
 
+function setup_buttons(game) {
+    document.getElementById("restart").onclick = new_game;
+    document.getElementById("computer-next-move").onclick = function() {
+        console.log("computer next move");
+        setTimeout(() => game_iteration_computer(game, false), 0);
+    }
+    document.getElementById("instructions").innerHTML="Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.";
+    document.getElementById("computer-all-moves").onclick = function() {
+        console.log("computer all moves");
+        document.getElementById('control-buttons').hidden = true;
+        document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
+        setTimeout(() => game_iteration_computer(game, true), 0);
+    }
+    document.getElementById('control-buttons').hidden = false;
+}
+
 function cancel_move() {
     player_next_move_first_coord = undefined;
     document.getElementById("cancel-move").innerHTML="";
@@ -83,18 +87,16 @@ function cancel_move() {
 function disable_auto_reply() {
     window.auto_reply = false;
     document.getElementById("auto-reply").innerHTML=
-        "<button onclick=\"window.enable_auto_reply()\">Enable auto-reply</button>";
+        "<button>Enable auto-reply</button>";
+    document.getElementById("auto-reply").onclick=enable_auto_reply;
 }
 
 function enable_auto_reply() {
     window.auto_reply = true;
     document.getElementById("auto-reply").innerHTML=
-        "<button onclick=\"window.disable_auto_reply()\">Disable auto-reply</button>";
+        "<button>Disable auto-reply</button>";
+    document.getElementById("auto-reply").onclick=disable_auto_reply;
 }
-
-//
-// these definitions are private
-//
 
 function check_winner(next_step) {
     let win_message = game.has_winner();
@@ -102,6 +104,7 @@ function check_winner(next_step) {
         setTimeout(() => next_step(), 0);
     } else {
         show_winner(win_message);
+        window.game_over=true;
     }
 }
 
@@ -137,6 +140,12 @@ function show_winner(win_message) {
 }
 
 function game_iteration_computer(game, auto) {
+    if (window.game_over) {
+        let message = "Game is already finished!";
+        show_stats(message);
+        console.log(message);
+        return;
+    }
     let stats = game.computer_play_turn();
     show_stats(stats);
     show_info(game);
