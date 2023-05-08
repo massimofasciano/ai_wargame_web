@@ -1,189 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
+
 <head>
 <meta charset="utf-8" />
 <title>AI Wargame</title>
-
-<style>
-:root {
-    background-color: black;
-    color: white;
-}
-/* #board {
-} */
-.board {
-    /* table-layout: fixed; */
-    border-collapse: collapse;
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-}
-.board_cell {
-    border: 1px solid #ddd;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 16px;
-    font-weight: bold;
-    color: #555;
-    padding: 10px;
-    width: 120px;
-    height: 60px;
-}
-.board_cell:hover {
-    background-color: #e6e6e6;
-}
-.board_row_name, .board_col_name, .board_info {
-    background-color: #5d88b7;
-    color: #fff;
-    padding: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-}
-.board_row_name {
-    width: 30px;
-}
-.board_Attacker, .board_Defender {
-    color: white;
-    font-size: 10px;
-    padding: 1px;
-}
-.board_Attacker {
-    background-color: #952727;
-}
-.board_Defender {
-    background-color: #3e94aa;
-}
-#info {
-    color: greenyellow;
-    font-size: 12px;
-    /* border: 3px solid green; */
-    height: 140px;
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-#stats {
-    color: orange;
-    font-size: 16px;
-    /* border: 3px solid green; */
-    height: 100px;
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-.stats-table {
-    border: 1px solid #ddd;
-    border-collapse: collapse;
-    text-align: left;
-    vertical-align: middle;
-    font-size: 16px;
-    color: #555;
-    background-color: #f2f2f2;
-    padding: 10px;
-}
-.stats-table td {
-    border: 1px solid #ddd;
-}
-.stats-table th {
-    border: 1px solid #ddd;
-}
-</style>
-<script>
-var game; // making this global for the HTML onclick functions
-var coord_string;
-function computer_next_move() {
-    setTimeout(() => game_iteration_computer(game, false), 0);
-}
-function computer_all_moves() {
-    document.getElementById("buttons").innerHTML="";
-    document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
-    setTimeout(() => game_iteration_computer(game, true), 0);
-}
-var player_next_move_first_coord = undefined; // making this global for the HTML onclick functions
-function cancel_move() {
-    player_next_move_first_coord = undefined;
-    document.getElementById("cancel-move").innerHTML="";
-}
-function player_next_move(row, col) {
-    console.log("Clicked at row:",row," col:",col);
-    if (player_next_move_first_coord == undefined ) {
-        player_next_move_first_coord = [row,col];
-        document.getElementById("cancel-move").innerHTML=
-            "<button onclick=\"cancel_move()\">Cancel move from "+
-                coord_string(player_next_move_first_coord)
-            +"</button>";
-    } else {
-        let to = [row,col];
-        let from = player_next_move_first_coord;
-        cancel_move();
-        let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
-        if (result != undefined) {
-            show_board(game);
-            show_stats(result);
-            check_winner(() => game_iteration_computer(game, false));
-        } else {
-            let message = "Invalid move!";
-            show_winner(message);
-            show_stats(message);            
-        }
-    }
-}
-function check_winner(next_step) {
-    let win_message = game.has_winner();
-    if (win_message == undefined) {
-        setTimeout(() => next_step(), 0);
-    } else {
-        show_winner(win_message);
-    }
-}
-function show_board(game) {
-    let game_html = game.html_string("board","player_next_move");
-    document.getElementById("board").innerHTML=game_html;
-}
-function show_damage_table(game) {
-    let table_html = game.damage_table_string("from / to");
-    document.getElementById("damage-table").innerHTML=table_html;
-    console.log(table_html);
-}
-function show_repair_table(game) {
-    let table_html = game.repair_table_string("from / to");
-    document.getElementById("repair-table").innerHTML=table_html;
-}
-function show_info(game) {
-    let game_info = game.info_string();
-    document.getElementById("info").innerText=game_info;
-}
-function show_stats(stats) {
-    document.getElementById("stats").innerText=stats;
-}
-function show_winner(win_message) {
-    show_stats(win_message);
-    for (let element of document.getElementsByClassName("board_info_moves")) {
-        element.innerText=win_message;
-    }
-}
-function game_iteration_computer(game, auto) {
-    let stats = game.computer_play_turn();
-    show_stats(stats);
-    show_info(game);
-    show_board(game);
-    check_winner(() => {
-        if (auto) {
-            game_iteration_computer(game, auto);
-        }
-    });
-}
-</script>
-<script type="module">
-import init, { WebGame } from "./pkg/ai_wargame_web.js";
-coord_string = (coord) => {
-    return WebGame.display_coord(coord[0],coord[1]);
-}
-init().then(() => {
-    game = new WebGame();
-    show_board(game);
-    show_damage_table(game);
-    show_repair_table(game);
-});
-</script>
+<link rel="stylesheet" href="game.css">
+<script type="module" src="game.js"></script>
 </head>
 
 <body>
@@ -192,8 +14,9 @@ init().then(() => {
     </div>
     <button onclick="location.reload()">Restart game</button>
     <span id="buttons">
-        <button onclick="computer_next_move()">Computer plays next move</button>
-        <button onclick="computer_all_moves()">Computer plays all moves</button>
+        <button onclick="window.computer_next_move()">Computer plays next move</button>
+        <button onclick="window.computer_all_moves()">Computer plays all moves</button>
+        <span id="auto-reply"></span>
     </span>
     <span id="cancel-move"></span>
     <br>

@@ -22,14 +22,14 @@ pub fn main() -> Result<(), JsValue> {
     Ok(())
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = Game)]
 #[derive(Debug,Clone,Default)]
-pub struct WebGame {
+pub struct JsGame {
     game: Game
 }
 
-#[wasm_bindgen]
-impl WebGame {
+#[wasm_bindgen(js_class = Game)]
+impl JsGame {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         let mut options = GameOptions::default();
@@ -42,7 +42,7 @@ impl WebGame {
         self.game.pretty_print_info(&mut buffer).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
     }
-    pub fn board_string(&self) -> String {
+    pub fn text_board_string(&self) -> String {
         let mut buffer = Vec::new();
         self.game.pretty_print_board(&mut buffer).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
@@ -53,8 +53,12 @@ impl WebGame {
     pub fn repair_table_string(&self, legend: &str) -> String {
         self.game.html_repair_table_string(Some(legend))
     }
-    pub fn html_string(&self, css_class: String, fn_click: String) -> String {
+    pub fn html_board_string(&self, css_class: String, fn_click: String) -> String {
         self.game.to_html_board_string(css_class, fn_click)
+    }
+    pub fn display_coord(from_row: Dim, from_col: Dim) -> String {
+        let from = Coord::from_tuple((from_row,from_col));
+        from.to_string()
     }
     pub fn has_winner(&self) -> Option<String> {
         if let Some(winner) = self.game.end_game_result() {
@@ -67,10 +71,6 @@ impl WebGame {
         let mut buffer = Vec::new();
         self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
         String::from_utf8_lossy(&buffer).to_string()
-    }
-    pub fn display_coord(from_row: Dim, from_col: Dim) -> String {
-        let from = Coord::from_tuple((from_row,from_col));
-        from.to_string()
     }
     pub fn player_play_turn(&mut self, from_row: Dim, from_col: Dim, to_row: Dim, to_col: Dim) -> Option<String> {
         let from = Coord::from_tuple((from_row,from_col));

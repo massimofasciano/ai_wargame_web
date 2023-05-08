@@ -1,0 +1,80 @@
+:root {
+    background-color: black;
+    color: white;
+}
+/* #board {
+} */
+.board {
+    /* table-layout: fixed; */
+    border-collapse: collapse;
+    background-color: #f2f2f2;
+    font-family: Arial, sans-serif;
+}
+.board_cell {
+    border: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    padding: 10px;
+    width: 120px;
+    height: 60px;
+}
+.board_cell:hover {
+    background-color: #e6e6e6;
+}
+.board_row_name, .board_col_name, .board_info {
+    background-color: #5d88b7;
+    color: #fff;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+.board_row_name {
+    width: 30px;
+}
+.board_Attacker, .board_Defender {
+    color: white;
+    font-size: 10px;
+    padding: 1px;
+}
+.board_Attacker {
+    background-color: #952727;
+}
+.board_Defender {
+    background-color: #3e94aa;
+}
+#info {
+    color: greenyellow;
+    font-size: 12px;
+    /* border: 3px solid green; */
+    height: 140px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+#stats {
+    color: orange;
+    font-size: 16px;
+    /* border: 3px solid green; */
+    height: 100px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.stats-table {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 16px;
+    color: #555;
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+.stats-table td {
+    border: 1px solid #ddd;
+}
+.stats-table th {
+    border: 1px solid #ddd;
+}
