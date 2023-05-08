@@ -157,11 +157,11 @@ function options_setup(game) {
         var heuristic = document.querySelector('input[name = heuristic]:checked').value;
         console.log("Heuristic: " + heuristic);
         switch(heuristic) {
-            case "uninformed": 
-                game.set_heuristics_uninformed();
+            case "simple1": 
+                game.set_heuristics_simple1();
                 break;
-            case "naive":
-                game.set_heuristics_naive();
+            case "simple2":
+                game.set_heuristics_simple2();
                 break;
             default:
                 game.set_heuristics_default();

@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use ai_wargame::{Game, GameOptions, Coord, Dim, heuristics::{uninformed_heuristic, naive_heuristic}};
+use ai_wargame::{Game, GameOptions, Coord, Dim, heuristics::{simple_heuristic_1, simple_heuristic_2}};
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -101,19 +101,19 @@ impl JsGame {
         self.game.set_options(options);
         console_log!("Max seconds set to {max_seconds}");
     }
-    pub fn set_heuristics_uninformed(&mut self) {
+    pub fn set_heuristics_simple1(&mut self) {
         let mut options = self.game.clone_options();
-        options.heuristics.set_attack_heuristics(uninformed_heuristic());
-        options.heuristics.set_defense_heuristics(uninformed_heuristic());
+        options.heuristics.set_attack_heuristics(simple_heuristic_1());
+        options.heuristics.set_defense_heuristics(simple_heuristic_1());
         self.game.set_options(options);
-        console_log!("Activated uninformed heuristic.");
+        console_log!("Activated simple1 heuristic.");
     }
-    pub fn set_heuristics_naive(&mut self) {
+    pub fn set_heuristics_simple2(&mut self) {
         let mut options = self.game.clone_options();
-        options.heuristics.set_attack_heuristics(naive_heuristic());
-        options.heuristics.set_defense_heuristics(naive_heuristic());
+        options.heuristics.set_attack_heuristics(simple_heuristic_2());
+        options.heuristics.set_defense_heuristics(simple_heuristic_2());
         self.game.set_options(options);
-        console_log!("Activated naive heuristic.");
+        console_log!("Activated simple2 heuristic.");
     }
     pub fn set_heuristics_default(&mut self) {
         let mut options = self.game.clone_options();
