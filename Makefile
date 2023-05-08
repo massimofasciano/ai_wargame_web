@@ -11,7 +11,7 @@ server:
 server3:
 	python3 -m http.server
 
-dist:
+dist: build
 	mkdir -p dist/
 	rm dist/*.zip
 	cp index.html game.js game.css dist/
