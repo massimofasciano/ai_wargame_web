@@ -1,6 +1,10 @@
 import init, { Game } from "./pkg/ai_wargame_web.js";
 
 init().then(() => {
+    new_game();
+});
+
+function new_game() {
     let game = new Game();
     // make these definitions available globally
     // from HTML via the window object
@@ -15,9 +19,13 @@ init().then(() => {
     // start the game
     show_board(game);
     enable_auto_reply();
+    options_setup(game);
     show_damage_table(game);
     show_repair_table(game);
-});
+    document.getElementById("restart").onclick = new_game;
+    document.getElementById("instructions").innerHTML="Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.";
+    document.getElementById('control-buttons').hidden = false;
+}
 
 //
 // these definitions are used directly from global scope in HTML
@@ -29,7 +37,7 @@ function computer_next_move() {
 }
 
 function computer_all_moves() {
-    document.getElementById("control-buttons").innerHTML="";
+    document.getElementById('control-buttons').hidden = true;
     document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
     setTimeout(() => game_iteration_computer(window.game, true), 0);
 }
@@ -142,4 +150,50 @@ function game_iteration_computer(game, auto) {
 
 function coord_string(coord) {
     return Game.display_coord(coord[0],coord[1]);
+}
+
+function options_setup(game) {
+    function set_heuristic() {
+        var heuristic = document.querySelector('input[name = heuristic]:checked').value;
+        console.log("Heuristic: " + heuristic);
+        switch(heuristic) {
+            case "uninformed": 
+                game.set_heuristics_uninformed();
+                break;
+            case "naive":
+                game.set_heuristics_naive();
+                break;
+            default:
+                game.set_heuristics_default();
+          }
+        game.set_heuristic
+    };
+    document.getElementById("heuristics").onclick = set_heuristic;
+    set_heuristic();
+    function auto_adjust_max_depth() {
+        let auto = document.getElementById("auto-depth").checked;
+        console.log("Auto-depth: " + auto);
+        game.auto_adjust_max_depth(auto);
+        if (!auto) {
+            set_max_depth();
+        }
+    }
+    document.getElementById("auto-depth").addEventListener('change', auto_adjust_max_depth);
+    auto_adjust_max_depth();
+    function set_max_depth() {
+        let str = document.getElementById("max-depth").value;
+        let number = parseInt(str, 10);
+        console.log("Max-depth: " + number);
+        game.set_max_depth(number);
+    }
+    document.getElementById("max-depth").addEventListener('change', set_max_depth);
+    set_max_depth();
+    function set_max_seconds() {
+        let str = document.getElementById("max-seconds").value;
+        let number = parseInt(str, 10);
+        console.log("Max-seconds: " + number);
+        game.set_max_seconds(number);
+    }
+    document.getElementById("max-seconds").addEventListener('change', set_max_seconds);
+    set_max_seconds();
 }

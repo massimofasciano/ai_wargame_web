@@ -11,10 +11,10 @@
 <body>
 <div id="game">
     <div id="board-group">
-    <div id="instructions">Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.</div><br>
+    <div id="instructions"></div><br>
     <div id="board"></div>
     <div id="buttons">
-        <button onclick="location.reload()">Restart game</button>
+        <button id="restart" onclick="location.reload()">Restart game</button>
         <span id="control-buttons">
             <button onclick="window.computer_next_move()">Computer plays next move</button>
             <button onclick="window.computer_all_moves()">Computer plays all moves</button>
@@ -24,6 +24,22 @@
     </div>
     <br>
     </div>
+
+    <div id="options-group">
+        <label for="max-depth">Search depth:</label>
+        <input type="number" id="max-depth" name="max-depth" min="2" max="20" value="6">
+        <label for="max-depth">auto-adjust:</label>
+        <input type="checkbox" id="auto-depth" name="auto-depth" checked>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <label for="max-seconds">Search time (seconds):</label>
+        <input type="number" id="max-seconds" name="max-seconds" min="1" max="120" value="5">
+        <form id="heuristics" name="heuristics"><span>Heuristics:&nbsp;</span>
+            uninformed<input type="radio" name="heuristic" value="uninformed">,
+            naïve<input type="radio" name="heuristic" value="naive">,
+            standard<input type="radio" name="heuristic" value="default" checked>
+        </form>
+    </div>
+    <br>
 
     <div id="stats-group">
     <table>

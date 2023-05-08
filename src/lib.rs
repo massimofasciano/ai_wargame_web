@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use ai_wargame::{Game, GameOptions, Coord, Dim};
+use ai_wargame::{Game, GameOptions, Coord, Dim, heuristics::{uninformed_heuristic, naive_heuristic}};
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -83,6 +83,44 @@ impl JsGame {
             console_log!("Invalid move from {from} to {to}");
             None
         }
+    }
+    pub fn auto_adjust_max_depth(&mut self, auto: bool) {
+        let mut options = self.game.clone_options();
+        options.adjust_max_depth = auto;
+        self.game.set_options(options);
+    }
+    pub fn set_max_depth(&mut self, max_depth : usize) {
+        let mut options = self.game.clone_options();
+        options.max_depth=Some(max_depth);
+        self.game.set_options(options);
+        console_log!("Max depth set to {max_depth}");
+    }
+    pub fn set_max_seconds(&mut self, max_seconds: f32) {
+        let mut options = self.game.clone_options();
+        options.max_seconds=Some(max_seconds);
+        self.game.set_options(options);
+        console_log!("Max seconds set to {max_seconds}");
+    }
+    pub fn set_heuristics_uninformed(&mut self) {
+        let mut options = self.game.clone_options();
+        options.heuristics.set_attack_heuristics(uninformed_heuristic());
+        options.heuristics.set_defense_heuristics(uninformed_heuristic());
+        self.game.set_options(options);
+        console_log!("Activated uninformed heuristic.");
+    }
+    pub fn set_heuristics_naive(&mut self) {
+        let mut options = self.game.clone_options();
+        options.heuristics.set_attack_heuristics(naive_heuristic());
+        options.heuristics.set_defense_heuristics(naive_heuristic());
+        self.game.set_options(options);
+        console_log!("Activated naive heuristic.");
+    }
+    pub fn set_heuristics_default(&mut self) {
+        let mut options = self.game.clone_options();
+        options.heuristics = Default::default();
+        self.game.set_options(options);
+        console_log!("Activated default heuristics.");
+
     }
 }
 
