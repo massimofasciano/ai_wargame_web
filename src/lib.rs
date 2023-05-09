@@ -2,16 +2,12 @@ use wasm_bindgen::prelude::*;
 
 use ai_wargame::{Game, GameOptions, Coord, Dim, heuristics::{simple_heuristic_1, simple_heuristic_2}};
 
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn console_log(s: &str);
 }
 
-#[allow(unused_macros)]
 macro_rules! console_log {
     ($($t:tt)*) => (console_log(&format_args!($($t)*).to_string()))
 }
@@ -123,4 +119,3 @@ impl JsGame {
 
     }
 }
-
