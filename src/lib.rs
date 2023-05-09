@@ -91,6 +91,12 @@ impl JsGame {
         self.game.set_options(options);
         console_log!("Max depth set to {max_depth}");
     }
+    pub fn set_max_moves(&mut self, max_moves : usize) {
+        let mut options = self.game.clone_options();
+        options.max_moves=Some(max_moves);
+        self.game.set_options(options);
+        console_log!("Max moves set to {max_moves}");
+    }
     pub fn set_max_seconds(&mut self, max_seconds: f32) {
         let mut options = self.game.clone_options();
         options.max_seconds=Some(max_seconds);

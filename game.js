@@ -209,4 +209,12 @@ function options_setup(game) {
     }
     document.getElementById("max-seconds").addEventListener('change', set_max_seconds);
     set_max_seconds();
+    function set_max_moves() {
+        let str = document.getElementById("max-moves").value;
+        let number = parseInt(str, 10);
+        console.log("Max-moves: " + number);
+        game.set_max_moves(number);
+    }
+    document.getElementById("max-moves").addEventListener('change', set_max_moves);
+    set_max_moves();
 }
