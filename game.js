@@ -1,18 +1,19 @@
 import init, { Game } from "./pkg/ai_wargame_web.js";
 
+// player_next_move and cancel_move use this variable
+var player_next_move_first_coord = undefined; 
+
+// player_next_move, enable_auto_reply
+// and disable_auto_reply use this variable
+var computer_auto_reply = true;
+
 init().then(() => {
     new_game();
 });
 
 function new_game() {
     let game = new Game();
-    // make these definitions available globally
-    // from HTML via the window object
-    window.game = game;
-    window.player_next_move = player_next_move;
-    window.auto_reply = true;
-    window.game_over=false;
-    // start the game
+    setup_board_onclick(game);
     show_board(game);
     enable_auto_reply();
     options_setup(game);
@@ -21,14 +22,9 @@ function new_game() {
     setup_buttons(game);
 }
 
-// player_next_move and cancel_move use this variable
-var player_next_move_first_coord = undefined; 
-
-// this function is called from HTML via window.player_next_move
-// and uses window.game and window.auto_reply
-function player_next_move(row, col) {
+function player_next_move(game, row, col) {
     console.log("Clicked at row:",row," col:",col);
-    if (window.game_over) {
+    if (is_game_over(game)) {
         let message = "Game is already finished!";
         show_stats(message);
         console.log(message);
@@ -42,7 +38,6 @@ function player_next_move(row, col) {
             +"</button>";
         document.getElementById("cancel-move").onclick=cancel_move;
     } else {
-        let game = window.game;
         let to = [row,col];
         let from = player_next_move_first_coord;
         cancel_move();
@@ -50,8 +45,8 @@ function player_next_move(row, col) {
         if (result != undefined) {
             show_board(game);
             show_stats(result);
-            check_winner(() => {
-                if (window.auto_reply) {
+            check_winner(game, function() {
+                if (computer_auto_reply) {
                     game_iteration_computer(game, false)
                 }
             });
@@ -85,31 +80,40 @@ function cancel_move() {
 }
 
 function disable_auto_reply() {
-    window.auto_reply = false;
+    computer_auto_reply = false;
     document.getElementById("auto-reply").innerHTML=
         "<button>Enable auto-reply</button>";
     document.getElementById("auto-reply").onclick=enable_auto_reply;
 }
 
 function enable_auto_reply() {
-    window.auto_reply = true;
+    computer_auto_reply = true;
     document.getElementById("auto-reply").innerHTML=
         "<button>Disable auto-reply</button>";
     document.getElementById("auto-reply").onclick=disable_auto_reply;
 }
 
-function check_winner(next_step) {
+function check_winner(game, next_step) {
     let win_message = game.has_winner();
     if (win_message == undefined) {
         setTimeout(() => next_step(), 0);
     } else {
         show_winner(win_message);
-        window.game_over=true;
+    }
+}
+
+function is_game_over(game) {
+    return game.has_winner() != undefined;
+}
+
+function setup_board_onclick(game) {
+    window.board_onclick = function(row,col) {
+        return player_next_move(game, row, col);
     }
 }
 
 function show_board(game) {
-    let game_html = game.html_board_string("board","window.player_next_move");
+    let game_html = game.html_board_string("board","window.board_onclick");
     document.getElementById("board").innerHTML=game_html;
 }
 
@@ -140,7 +144,7 @@ function show_winner(win_message) {
 }
 
 function game_iteration_computer(game, auto) {
-    if (window.game_over) {
+    if (is_game_over(game)) {
         let message = "Game is already finished!";
         show_stats(message);
         console.log(message);
@@ -150,7 +154,7 @@ function game_iteration_computer(game, auto) {
     show_stats(stats);
     show_info(game);
     show_board(game);
-    check_winner(() => {
+    check_winner(game, function() {
         if (auto) {
             game_iteration_computer(game, auto);
         }
