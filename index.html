@@ -30,17 +30,21 @@
         <input type="number" id="max-depth" name="max-depth" min="2" max="20" value="6">
         <label for="max-depth">auto-adjust:</label>
         <input type="checkbox" id="auto-depth" name="auto-depth" checked>
-        <span>&nbsp;</span>
+        <span>&nbsp;&nbsp;&nbsp;</span>
         <label for="max-seconds">Search time (seconds):</label>
         <input type="number" id="max-seconds" name="max-seconds" min="1" max="120" value="5">
-        <span>&nbsp;</span>
-        <label for="max-moves">Max moves:</label>
-        <input type="number" id="max-moves" name="max-moves" min="25" max="250" value="100">
-        <form id="heuristics" name="heuristics"><span>Heuristics:&nbsp;</span>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <label for="rand-traversal">Random:</label>
+        <input type="checkbox" id="rand-traversal" name="rand-traversal" checked>
+        <br>
+        <form id="heuristics" name="heuristics" style="display: inline"><span>Heuristics:&nbsp;</span>
             pieces<input type="radio" name="heuristic" value="simple1">,
             health<input type="radio" name="heuristic" value="simple2">,
             standard<input type="radio" name="heuristic" value="default" checked>
         </form>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <label for="max-moves">Max moves:</label>
+        <input type="number" id="max-moves" name="max-moves" min="25" max="250" value="100">
     </div>
     <br>
 

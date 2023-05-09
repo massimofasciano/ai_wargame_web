@@ -103,6 +103,12 @@ impl JsGame {
         self.game.set_options(options);
         console_log!("Max seconds set to {max_seconds}");
     }
+    pub fn set_rand_traversal(&mut self, rand_traversal : bool) {
+        let mut options = self.game.clone_options();
+        options.rand_traversal=rand_traversal;
+        self.game.set_options(options);
+        console_log!("Random traversal set to {rand_traversal}");
+    }
     pub fn set_heuristics_simple1(&mut self) {
         let mut options = self.game.clone_options();
         options.heuristics.set_attack_heuristics(simple_heuristic_1());

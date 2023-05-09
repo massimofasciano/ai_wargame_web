@@ -217,4 +217,11 @@ function options_setup(game) {
     }
     document.getElementById("max-moves").addEventListener('change', set_max_moves);
     set_max_moves();
+    function rand_traversal() {
+        let random = document.getElementById("rand-traversal").checked;
+        console.log("Random traversal: " + random);
+        game.set_rand_traversal(random);
+    }
+    document.getElementById("rand-traversal").addEventListener('change', rand_traversal);
+    rand_traversal();
 }
