@@ -1,21 +1,16 @@
 import init, { Game } from "./pkg/ai_wargame_web.js";
 
-// player_next_move and cancel_move use this variable
-var player_next_move_first_coord = undefined; 
-
-// player_next_move, enable_auto_reply
-// and disable_auto_reply use this variable
-var computer_auto_reply = true;
-
 init().then(() => {
     new_game();
 });
 
 function new_game() {
     let game = new Game();
+    game.auto_reply = true;
+    game.first_coord = undefined;
     setup_board_onclick(game);
     show_board(game);
-    enable_auto_reply();
+    enable_auto_reply(game);
     options_setup(game);
     show_damage_table(game);
     show_repair_table(game);
@@ -30,23 +25,25 @@ function player_next_move(game, row, col) {
         console.log(message);
         return;
     }
-    if (player_next_move_first_coord == undefined ) {
-        player_next_move_first_coord = [row,col];
+    if (game.first_coord == undefined ) {
+        game.first_coord = [row,col];
         document.getElementById("cancel-move").innerHTML=
             "<button>Cancel move from "+
-                coord_string(player_next_move_first_coord)
+                coord_string(game.first_coord)
             +"</button>";
-        document.getElementById("cancel-move").onclick=cancel_move;
+        document.getElementById("cancel-move").onclick = function() {
+            cancel_move(game);
+        };
     } else {
         let to = [row,col];
-        let from = player_next_move_first_coord;
-        cancel_move();
+        let from = game.first_coord;
+        cancel_move(game);
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
             show_board(game);
             show_stats(result);
             check_winner(game, function() {
-                if (computer_auto_reply) {
+                if (game.auto_reply) {
                     game_iteration_computer(game, false)
                 }
             });
@@ -74,23 +71,27 @@ function setup_buttons(game) {
     document.getElementById('control-buttons').hidden = false;
 }
 
-function cancel_move() {
-    player_next_move_first_coord = undefined;
+function cancel_move(game) {
+    game.first_coord = undefined;
     document.getElementById("cancel-move").innerHTML="";
 }
 
-function disable_auto_reply() {
-    computer_auto_reply = false;
+function disable_auto_reply(game) {
+    game.auto_reply = false;
     document.getElementById("auto-reply").innerHTML=
         "<button>Enable auto-reply</button>";
-    document.getElementById("auto-reply").onclick=enable_auto_reply;
+    document.getElementById("auto-reply").onclick = function() {
+        enable_auto_reply(game);
+    };
 }
 
-function enable_auto_reply() {
-    computer_auto_reply = true;
+function enable_auto_reply(game) {
+    game.auto_reply = true;
     document.getElementById("auto-reply").innerHTML=
         "<button>Disable auto-reply</button>";
-    document.getElementById("auto-reply").onclick=disable_auto_reply;
+    document.getElementById("auto-reply").onclick = function() {
+        disable_auto_reply(game);
+    }
 }
 
 function check_winner(game, next_step) {
@@ -178,8 +179,7 @@ function options_setup(game) {
                 break;
             default:
                 game.set_heuristics_default();
-          }
-        game.set_heuristic
+        }
     };
     document.getElementById("heuristics").onclick = set_heuristic;
     set_heuristic();
