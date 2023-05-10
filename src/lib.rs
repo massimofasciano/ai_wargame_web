@@ -109,6 +109,12 @@ impl JsGame {
         self.game.set_options(options);
         console_log!("Random traversal set to {rand_traversal}");
     }
+    pub fn set_alpha_beta(&mut self, alpha_beta : bool) {
+        let mut options = self.game.clone_options();
+        options.pruning=alpha_beta;
+        self.game.set_options(options);
+        console_log!("Alpha-Beta pruning set to {alpha_beta}");
+    }
     pub fn set_heuristics_simple1(&mut self) {
         let mut options = self.game.clone_options();
         options.heuristics.set_attack_heuristics(simple_heuristic_1());
