@@ -224,4 +224,11 @@ function options_setup(game) {
     }
     document.getElementById("rand-traversal").addEventListener('change', rand_traversal);
     rand_traversal();
+    function alpha_beta() {
+        let ab = document.getElementById("alpha-beta").checked;
+        console.log("Alpha-Beta: " + ab);
+        // game.set_alpha_beta(ab);
+    }
+    document.getElementById("alpha-beta").addEventListener('change', alpha_beta);
+    alpha_beta();
 }

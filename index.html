@@ -10,42 +10,32 @@
 
 <body>
 <div id="game-group">
-    <div id="board-group">
-    <div id="instructions"></div><br>
-    <div id="board"></div>
-    <div id="buttons">
-        <button id="restart" onclick="location.reload()">Restart game</button>
-        <span id="control-buttons">
-            <button id="computer-next-move">Computer plays next move</button>
-            <button id="computer-all-moves">Computer plays all moves</button>
-            <span id="auto-reply"></span>
-        </span>
-        <span id="cancel-move"></span>
-    </div>
-    <br>
-    </div>
 
     <div id="options-group">
-        <label for="max-depth">Search depth:</label>
+        <label for="max-depth">Max depth:</label>
         <input type="number" id="max-depth" name="max-depth" min="2" max="20" value="6">
         <label for="max-depth">auto-adjust:</label>
         <input type="checkbox" id="auto-depth" name="auto-depth" checked>
         <span>&nbsp;&nbsp;&nbsp;</span>
-        <label for="max-seconds">Search time (seconds):</label>
+        <label for="max-seconds">Max time (seconds):</label>
         <input type="number" id="max-seconds" name="max-seconds" min="1" max="120" value="5">
         <span>&nbsp;&nbsp;&nbsp;</span>
         <label for="rand-traversal">Random:</label>
         <input type="checkbox" id="rand-traversal" name="rand-traversal" checked>
         <br>
         <form id="heuristics" name="heuristics" style="display: inline"><span>Heuristics:&nbsp;</span>
-            pieces<input type="radio" name="heuristic" value="simple1">,
-            health<input type="radio" name="heuristic" value="simple2">,
-            standard<input type="radio" name="heuristic" value="default" checked>
+            e1<input type="radio" name="heuristic" value="simple1">&nbsp;
+            e2<input type="radio" name="heuristic" value="simple2">&nbsp;
+            e3/e4<input type="radio" name="heuristic" value="default" checked>
         </form>
         <span>&nbsp;&nbsp;&nbsp;</span>
         <label for="max-moves">Max moves:</label>
         <input type="number" id="max-moves" name="max-moves" min="25" max="250" value="100">
+        <span>&nbsp;&nbsp;&nbsp;</span>
+        <label for="alpha-beta">Alpha-Beta:</label>
+        <input type="checkbox" id="alpha-beta" name="alpha-beta" checked>
     </div>
+
     <br>
 
     <div id="stats-group">
@@ -61,8 +51,25 @@
     </td>
     </tr>
     </table>
-    <br>
     </div>
+
+    <br>
+
+    <div id="board-group">
+    <div id="instructions"></div><br>
+    <div id="board"></div>
+    <div id="buttons">
+        <button id="restart" onclick="location.reload()">Restart game</button>
+        <span id="control-buttons">
+            <button id="computer-next-move">Computer plays next move</button>
+            <button id="computer-all-moves">Computer plays all moves</button>
+            <span id="auto-reply"></span>
+        </span>
+        <span id="cancel-move"></span>
+    </div>
+    </div>
+
+    <br>
 
     <div id="trace-group">
     Debug trace:<br>
@@ -73,6 +80,7 @@
     </tr>
     </table>
     </div>
+
 </div>
 </body>
 
