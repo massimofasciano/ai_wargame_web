@@ -8,6 +8,7 @@ function new_game() {
     let game = new Game();
     game.auto_reply = true;
     game.first_coord = undefined;
+    game.aborted = false;
     setup_board_onclick(game);
     show_board(game);
     enable_auto_reply(game);
@@ -15,13 +16,21 @@ function new_game() {
     show_damage_table(game);
     show_repair_table(game);
     setup_buttons(game);
+    show_result("");
+    show_info(undefined);
+}
+
+function restart_game(game) {
+    console.log("restarting game...");
+    game.aborted = true;
+    new_game();
 }
 
 function player_next_move(game, row, col) {
     console.log("Clicked at row:",row," col:",col);
     if (is_game_over(game)) {
         let message = "Game is already finished!";
-        show_stats(message);
+        show_result(message);
         console.log(message);
         return;
     }
@@ -41,7 +50,7 @@ function player_next_move(game, row, col) {
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
             show_board(game);
-            show_stats(result);
+            show_result(result);
             check_winner(game, function() {
                 if (game.auto_reply) {
                     game_iteration_computer(game, false)
@@ -50,13 +59,15 @@ function player_next_move(game, row, col) {
         } else {
             let message = "Invalid move!";
             show_winner(message);
-            show_stats(message);            
+            show_result(message);            
         }
     }
 }
 
 function setup_buttons(game) {
-    document.getElementById("restart").onclick = new_game;
+    document.getElementById("restart").onclick = function() {
+        restart_game(game);
+    }
     document.getElementById("computer-next-move").onclick = function() {
         console.log("computer next move");
         setTimeout(() => game_iteration_computer(game, false), 0);
@@ -129,16 +140,19 @@ function show_repair_table(game) {
 }
 
 function show_info(game) {
-    let game_info = game.info_string();
-    document.getElementById("info").innerText=game_info;
+    let info = "";
+    if (game != undefined) {
+        info = game.info_string();
+    }
+    document.getElementById("info").innerText=info;
 }
 
-function show_stats(stats) {
-    document.getElementById("stats").innerText=stats;
+function show_result(result) {
+    document.getElementById("result").innerText=result;
 }
 
 function show_winner(win_message) {
-    show_stats(win_message);
+    show_result(win_message);
     for (let element of document.getElementsByClassName("board_info_moves")) {
         element.innerText=win_message;
     }
@@ -147,12 +161,16 @@ function show_winner(win_message) {
 function game_iteration_computer(game, auto) {
     if (is_game_over(game)) {
         let message = "Game is already finished!";
-        show_stats(message);
+        show_result(message);
         console.log(message);
         return;
     }
-    let stats = game.computer_play_turn();
-    show_stats(stats);
+    let result = game.computer_play_turn();
+    if (game.aborted) {
+        console.log("aborting game...")
+        return;
+    }
+    show_result(result);
     show_info(game);
     show_board(game);
     check_winner(game, function() {
