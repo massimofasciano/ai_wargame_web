@@ -189,14 +189,14 @@ function options_setup(game) {
         var heuristic = document.querySelector('input[name = heuristic]:checked').value;
         console.log("Heuristic: " + heuristic);
         switch(heuristic) {
-            case "simple1": 
-                game.set_heuristics_simple1();
+            case "e1": 
+                game.set_heuristics_e1();
                 break;
-            case "simple2":
-                game.set_heuristics_simple2();
+            case "e2":
+                game.set_heuristics_e2();
                 break;
             default:
-                game.set_heuristics_default();
+                game.set_heuristics_e3e4();
         }
     };
     document.getElementById("heuristics").onclick = set_heuristic;

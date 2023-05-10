@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use ai_wargame::{Game, GameOptions, Coord, Dim, heuristics::{simple_heuristic_1, simple_heuristic_2}};
+use ai_wargame::{Game, GameOptions, Coord, Dim};
 
 #[wasm_bindgen]
 extern "C" {
@@ -115,25 +115,23 @@ impl JsGame {
         self.game.set_options(options);
         console_log!("Alpha-Beta pruning set to {alpha_beta}");
     }
-    pub fn set_heuristics_simple1(&mut self) {
+    pub fn set_heuristics_e1(&mut self) {
         let mut options = self.game.clone_options();
-        options.heuristics.set_attack_heuristics(simple_heuristic_1());
-        options.heuristics.set_defense_heuristics(simple_heuristic_1());
+        options.heuristics.set_e1();
         self.game.set_options(options);
-        console_log!("Activated simple1 heuristic.");
+        console_log!("Activated e1 heuristic.");
     }
-    pub fn set_heuristics_simple2(&mut self) {
+    pub fn set_heuristics_e2(&mut self) {
         let mut options = self.game.clone_options();
-        options.heuristics.set_attack_heuristics(simple_heuristic_2());
-        options.heuristics.set_defense_heuristics(simple_heuristic_2());
+        options.heuristics.set_e2();
         self.game.set_options(options);
-        console_log!("Activated simple2 heuristic.");
+        console_log!("Activated e2 heuristic.");
     }
-    pub fn set_heuristics_default(&mut self) {
+    pub fn set_heuristics_e3e4(&mut self) {
         let mut options = self.game.clone_options();
-        options.heuristics = Default::default();
+        options.heuristics.set_e3e4();
         self.game.set_options(options);
-        console_log!("Activated default heuristics.");
+        console_log!("Activated e3/e4 heuristics.");
 
     }
 }
