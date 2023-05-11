@@ -47,6 +47,7 @@ function player_next_move(game, row, col) {
         let to = [row,col];
         let from = game.first_coord;
         cancel_move(game);
+        post_move(from,to);
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
             show_board(game);
@@ -250,3 +251,29 @@ function options_setup(game) {
     document.getElementById("alpha-beta").addEventListener('change', alpha_beta);
     alpha_beta();
 }
+
+var broker_url = "http://localhost:8001";
+
+function post_move(from, to) {
+    let data = {
+        from: from,
+        to: to,
+    };
+    // post_json_data(broker_url, data);
+}
+
+function post_json_data(url, data) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var json_reply = JSON.parse(xhr.responseText);
+            console.log("Got reply from ", url, ": ",json_reply);
+        }
+    };
+    var data_json = JSON.stringify(data);
+    xhr.send(data_json);
+    console.log("Sent to ", url, ": ",data_json);
+}
+    

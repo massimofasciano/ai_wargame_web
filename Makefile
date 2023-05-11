@@ -11,6 +11,12 @@ server:
 server3:
 	python3 -m http.server
 
+broker:
+	python game_broker.py
+
+broker3:
+	python3 game_broker.py
+
 dist: build
 	mkdir -p dist/
 	rm dist/*.zip
