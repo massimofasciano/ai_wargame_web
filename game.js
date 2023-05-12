@@ -47,11 +47,12 @@ function player_next_move(game, row, col) {
         let to = [row,col];
         let from = game.first_coord;
         cancel_move(game);
-        post_move(from,to);
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
+            post_move(from,to);
             show_board(game);
             show_result(result);
+            highlight_move(from, to);
             check_winner(game, function() {
                 if (game.auto_reply) {
                     game_iteration_computer(game, false)
@@ -81,6 +82,10 @@ function setup_buttons(game) {
         setTimeout(() => game_iteration_computer(game, true), 0);
     }
     document.getElementById('control-buttons').hidden = false;
+    document.getElementById("broker-next-move").onclick = function() {
+        console.log("broker next move");
+        setTimeout(() => broker_next_move(game), 0);
+    }
 }
 
 function cancel_move(game) {
@@ -126,7 +131,7 @@ function setup_board_onclick(game) {
 }
 
 function show_board(game) {
-    let game_html = game.html_board_string("board","window.board_onclick");
+    let game_html = game.html_board_string("board","board-table","window.board_onclick");
     document.getElementById("board").innerHTML=game_html;
 }
 
@@ -167,18 +172,30 @@ function game_iteration_computer(game, auto) {
         return;
     }
     let result = game.computer_play_turn();
+    console.log("Move result from computer: ", result);
     if (game.aborted) {
         console.log("aborting game...")
         return;
     }
-    show_result(result);
+    show_result(result.string);
     show_info(game);
     show_board(game);
+    if (result.coords != undefined) {
+        let from = [result.coords.from.row, result.coords.from.col];
+        let to = [result.coords.to.row, result.coords.to.col];
+        post_move(from, to);
+        highlight_move(from, to);
+    }
     check_winner(game, function() {
         if (auto) {
             game_iteration_computer(game, auto);
         }
     });
+}
+
+function highlight_move(from, to) {
+    document.getElementById("board-table-"+from[0]+"-"+from[1]).style.backgroundColor = "#e2dcd4";
+    document.getElementById("board-table-"+to[0]+"-"+to[1]).style.backgroundColor = "#e9e7e2";
 }
 
 function coord_string(coord) {
@@ -252,14 +269,16 @@ function options_setup(game) {
     alpha_beta();
 }
 
-var broker_url = "http://localhost:8001";
-
 function post_move(from, to) {
     let data = {
         from: from,
         to: to,
     };
-    // post_json_data(broker_url, data);
+    let broker_url = document.getElementById("broker-url").value;
+    if (broker_url.length > 0) {
+        console.log("Broker URL: ",broker_url);
+        post_json_data(broker_url, data);
+    }
 }
 
 function post_json_data(url, data) {
@@ -276,4 +295,53 @@ function post_json_data(url, data) {
     xhr.send(data_json);
     console.log("Sent to ", url, ": ",data_json);
 }
-    
+
+function get_move(next_step) {
+    let broker_url = document.getElementById("broker-url").value;
+    if (broker_url.length > 0) {
+        console.log("Broker URL: ",broker_url);
+        get_json_data(broker_url, next_step);
+    }
+}
+
+function get_json_data(url, next_step) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var json_reply = JSON.parse(xhr.responseText);
+            console.log("Got reply from ", url, ": ",json_reply);
+            next_step(json_reply.data.from, json_reply.data.to)
+        }
+    };
+    xhr.send();
+    console.log("Requested data from ", url);
+}
+
+function broker_next_move(game) {
+    if (is_game_over(game)) {
+        let message = "Game is already finished!";
+        show_result(message);
+        console.log(message);
+        return;
+    }
+    get_move(function(from,to) {
+        let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
+        if (result != undefined) {
+            show_board(game);
+            show_result(result);
+            highlight_move(from, to);
+            check_winner(game, function() {
+                if (game.auto_reply) {
+                    game_iteration_computer(game, false)
+                }
+            });
+        } else {
+            let message = "Invalid move!";
+            show_winner(message);
+            show_result(message);            
+        }
+    });
+}
+

@@ -1,37 +1,68 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from http import HTTPStatus
 import json
-import time
+import random
+import string
+import socket   
 
+def get_random_string(length):
+    letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
-message = {
-    'from': [3,4],
-    'to': [4,4],
-    'move': 0,
-    'player': 0
-}
+stored_information = {}
+
+server_id = get_random_string(8)
+
+def remove_prefix(text, prefix):
+    return text[len(prefix):] if text.startswith(prefix) else text
+
+invalid_id = {'success': False, 'error':'invalid server id'}
+return_information = {'success': True, 'data':stored_information}
 
 class _RequestHandler(BaseHTTPRequestHandler):
 
-    def _set_headers(self):
+    def _set_ok(self):
         self.send_response(HTTPStatus.OK.value)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
+    def _set_error(self):
+        self.send_response(HTTPStatus.NOT_FOUND.value)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+
     def do_GET(self):
-        global message;
-        self._set_headers()
-        self.wfile.write(json.dumps(message).encode('utf-8'))
+        global server_id
+        request_id = remove_prefix(self.path,'/')
+        if request_id == server_id:
+            global stored_information, return_information
+            self._set_ok()
+            return_information['data']=stored_information
+            self.wfile.write(json.dumps(return_information).encode('utf-8'))
+        else:
+            global invalid_id
+            self._set_error()
+            self.wfile.write(json.dumps(invalid_id).encode('utf8'))
 
     def do_POST(self):
-        global message;
-        length = int(self.headers.get('content-length'))
-        new_message = json.loads(self.rfile.read(length))
-        message = new_message;
-        self._set_headers()
-        self.wfile.write(json.dumps({'success': True}).encode('utf-8'))
-        print(message)
+        global server_id
+        request_id = remove_prefix(self.path,'/')
+        if request_id == server_id:
+            global stored_information, return_information
+            content_length = self.headers.get('content-length')
+            if content_length != None:
+                length = int(content_length)
+                stored_information = json.loads(self.rfile.read(length))
+                self._set_ok()
+                return_information['data']=stored_information
+                self.wfile.write(json.dumps(return_information).encode('utf-8'))
+                print(stored_information)
+        else:
+            global invalid_id
+            self._set_error()
+            self.wfile.write(json.dumps(invalid_id).encode('utf8'))
 
     def do_OPTIONS(self):
         self.send_response(HTTPStatus.NO_CONTENT.value)
@@ -41,9 +72,11 @@ class _RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
 def run_server():
+    hostname=socket.gethostname()   
+    IPAddr=socket.gethostbyname(hostname)   
     server_address = ('', 8001)
     httpd = HTTPServer(server_address, _RequestHandler)
-    print('serving at %s:%d' % server_address)
+    print(f'serving at http://{IPAddr}:{server_address[1]}/{server_id}')
     httpd.serve_forever()
 
 

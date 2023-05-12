@@ -94,5 +94,14 @@
 }
 #buttons {
     width: 660px;
-    height: 30px;
+    height: 60px;
+}
+#broker-url {
+    width: 250px;
+}
+.board_cell_from {
+    background-color: #e2dcd4;
+}
+.board_cell_to {
+    background-color: #e9e7e2;
 }

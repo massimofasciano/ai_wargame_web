@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use ai_wargame::{Game, GameOptions, Coord, Dim};
+use ai_wargame::{Game, GameOptions, Coord, Dim, CoordPair, Action};
 
 #[wasm_bindgen]
 extern "C" {
@@ -16,6 +16,39 @@ macro_rules! console_log {
 pub fn main() -> Result<(), JsValue> {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     Ok(())
+}
+
+#[wasm_bindgen(js_name = Coord)]
+#[derive(Debug,Clone,Copy)]
+pub struct JsCoord {
+   pub row: Dim,
+   pub col: Dim,
+}
+
+impl From<Coord> for JsCoord {
+    fn from(value: Coord) -> Self {
+        Self { row: value.row, col: value.col }
+    }
+}
+
+#[wasm_bindgen(js_name = CoordPair)]
+#[derive(Debug,Clone,Copy)]
+pub struct JsCoordPair {
+    pub from: JsCoord,
+    pub to: JsCoord,
+}
+
+impl From<CoordPair> for JsCoordPair {
+    fn from(value: CoordPair) -> Self {
+        Self { from: value.from.into(), to: value.to.into() }
+    }
+}
+
+#[wasm_bindgen(getter_with_clone)]
+#[derive(Debug,Clone)]
+pub struct MoveResult {
+    pub coords: Option<JsCoordPair>,
+    pub string: String,
 }
 
 #[wasm_bindgen(js_name = Game)]
@@ -49,8 +82,8 @@ impl JsGame {
     pub fn repair_table_string(&self, legend: &str) -> String {
         self.game.html_repair_table_string(Some(legend))
     }
-    pub fn html_board_string(&self, css_class: String, fn_click: String) -> String {
-        self.game.to_html_board_string(css_class, fn_click)
+    pub fn html_board_string(&self, css_class: String, id: String, fn_click: String) -> String {
+        self.game.to_html_board_string(css_class, id, fn_click)
     }
     pub fn display_coord(from_row: Dim, from_col: Dim) -> String {
         let from = Coord::from_tuple((from_row,from_col));
@@ -63,10 +96,13 @@ impl JsGame {
             None
         }
     }
-    pub fn computer_play_turn(&mut self) -> String {
+    pub fn computer_play_turn(&mut self) -> MoveResult {
         let mut buffer = Vec::new();
-        self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer");
-        String::from_utf8_lossy(&buffer).to_string()
+        let coords = self.game.computer_play_turn(Some(&mut buffer)).expect("should work in a vec buffer")
+            .and_then(Action::into_coord_pair).map(Into::into);
+        MoveResult { coords,
+            string: String::from_utf8_lossy(&buffer).to_string()
+        }
     }
     pub fn player_play_turn(&mut self, from_row: Dim, from_col: Dim, to_row: Dim, to_col: Dim) -> Option<String> {
         let from = Coord::from_tuple((from_row,from_col));
