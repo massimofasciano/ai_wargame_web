@@ -84,6 +84,7 @@ function setup_buttons(game) {
     document.getElementById('control-buttons').hidden = false;
     document.getElementById("broker-next-move").onclick = function() {
         console.log("broker next move");
+        document.getElementById("broker-next-move").disabled = true;
         setTimeout(() => broker_next_move(game), 0);
     }
 }
@@ -335,7 +336,6 @@ function get_json_data(game, url, next_step) {
 }
 
 function broker_next_move(game) {
-    document.getElementById("broker-next-move").disabled = true;
     if (is_game_over(game)) {
         let message = "Game is already finished!";
         show_result(message);
