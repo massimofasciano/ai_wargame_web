@@ -12,10 +12,10 @@ server3:
 	python3 -m http.server
 
 broker:
-	python game_broker.py
+	python game_broker.py test
 
 broker3:
-	python3 game_broker.py
+	python3 game_broker.py test
 
 dist: build
 	mkdir -p dist/

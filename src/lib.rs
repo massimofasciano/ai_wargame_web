@@ -170,4 +170,7 @@ impl JsGame {
         console_log!("Activated e3/e4 heuristics.");
 
     }
+    pub fn moves_played(&self) -> usize {
+        self.game.total_moves()
+    }
 }

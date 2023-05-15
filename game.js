@@ -49,13 +49,13 @@ function player_next_move(game, row, col) {
         cancel_move(game);
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
-            post_move(from,to);
+            post_move(game,from,to);
             show_board(game);
             show_result(result);
             highlight_move(from, to);
             check_winner(game, function() {
                 if (game.auto_reply) {
-                    game_iteration_computer(game, false)
+                    game_iteration_computer(game, undefined)
                 }
             });
         } else {
@@ -72,14 +72,14 @@ function setup_buttons(game) {
     }
     document.getElementById("computer-next-move").onclick = function() {
         console.log("computer next move");
-        setTimeout(() => game_iteration_computer(game, false), 0);
+        setTimeout(() => game_iteration_computer(game, undefined), 0);
     }
     document.getElementById("instructions").innerHTML="Click on a source cell and then on a destination cell to perform a move. Same cell = self-destruct.";
     document.getElementById("computer-all-moves").onclick = function() {
         console.log("computer all moves");
         document.getElementById('control-buttons').hidden = true;
         document.getElementById("instructions").innerHTML="Computer is playing in automatic mode.";
-        setTimeout(() => game_iteration_computer(game, true), 0);
+        setTimeout(() => game_iteration_computer(game, game_iteration_computer), 0);
     }
     document.getElementById('control-buttons').hidden = false;
     document.getElementById("broker-next-move").onclick = function() {
@@ -164,7 +164,7 @@ function show_winner(win_message) {
     }
 }
 
-function game_iteration_computer(game, auto) {
+function game_iteration_computer(game, next_step) {
     if (is_game_over(game)) {
         let message = "Game is already finished!";
         show_result(message);
@@ -183,12 +183,12 @@ function game_iteration_computer(game, auto) {
     if (result.coords != undefined) {
         let from = [result.coords.from.row, result.coords.from.col];
         let to = [result.coords.to.row, result.coords.to.col];
-        post_move(from, to);
+        post_move(game, from, to);
         highlight_move(from, to);
     }
     check_winner(game, function() {
-        if (auto) {
-            game_iteration_computer(game, auto);
+        if (next_step != undefined) {
+            next_step(game, next_step);
         }
     });
 }
@@ -269,10 +269,11 @@ function options_setup(game) {
     alpha_beta();
 }
 
-function post_move(from, to) {
+function post_move(game, from, to) {
     let data = {
-        from: from,
-        to: to,
+        from: { row: from[0], col: from[1] },
+        to: { row: to[0], col: to[1] },
+        turn: game.moves_played(),
     };
     let broker_url = document.getElementById("broker-url").value;
     if (broker_url.length > 0) {
@@ -296,15 +297,16 @@ function post_json_data(url, data) {
     console.log("Sent to ", url, ": ",data_json);
 }
 
-function get_move(next_step) {
+function get_move(game, next_step) {
     let broker_url = document.getElementById("broker-url").value;
     if (broker_url.length > 0) {
         console.log("Broker URL: ",broker_url);
-        get_json_data(broker_url, next_step);
+        get_json_data(game, broker_url, next_step);
     }
 }
 
-function get_json_data(url, next_step) {
+function get_json_data(game, url, next_step) {
+    var next_turn = game.moves_played() + 1;
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -312,7 +314,20 @@ function get_json_data(url, next_step) {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json_reply = JSON.parse(xhr.responseText);
             console.log("Got reply from ", url, ": ",json_reply);
-            next_step(json_reply.data.from, json_reply.data.to)
+            var data = json_reply.data;
+            if (data != undefined && data.turn == next_turn) {
+                next_step(
+                    [data.from.row,data.from.col], 
+                    [data.to.row, data.to.col]
+                );
+            } else {
+                if (game.aborted) {
+                    console.log("aborting game...")
+                    return;
+                }
+                console.log("Broker not ready or invalid data: retry in 500ms");
+                setTimeout(() => get_json_data(game, url, next_step), 500);
+            }
         }
     };
     xhr.send();
@@ -320,13 +335,14 @@ function get_json_data(url, next_step) {
 }
 
 function broker_next_move(game) {
+    document.getElementById("broker-next-move").disabled = true;
     if (is_game_over(game)) {
         let message = "Game is already finished!";
         show_result(message);
         console.log(message);
         return;
     }
-    get_move(function(from,to) {
+    get_move(game,function(from,to) {
         let result = game.player_play_turn(from[0],from[1],to[0],to[1]);
         if (result != undefined) {
             show_board(game);
@@ -334,8 +350,9 @@ function broker_next_move(game) {
             highlight_move(from, to);
             check_winner(game, function() {
                 if (game.auto_reply) {
-                    game_iteration_computer(game, false)
+                    game_iteration_computer(game, undefined)
                 }
+                document.getElementById("broker-next-move").disabled = false;
             });
         } else {
             let message = "Invalid move!";
@@ -344,4 +361,3 @@ function broker_next_move(game) {
         }
     });
 }
-
