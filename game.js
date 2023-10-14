@@ -278,15 +278,22 @@ function post_move(game, from, to) {
     };
     let broker_url = document.getElementById("broker-url").value;
     if (broker_url.length > 0) {
+        let broker_username = document.getElementById("broker-username").value;
+        let broker_password = document.getElementById("broker-password").value;
         console.log("Broker URL: ",broker_url);
-        post_json_data(broker_url, data);
+        console.log("Broker Username: ", broker_username);
+        // console.log("Broker Password: ", broker_password);
+        post_json_data(broker_url, data, broker_username, broker_password);
     }
 }
 
-function post_json_data(url, data) {
+function post_json_data(url, data, username, password) {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
+    if (username.length > 0) {
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(username+":"+password));
+    }
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json_reply = JSON.parse(xhr.responseText);
@@ -301,16 +308,23 @@ function post_json_data(url, data) {
 function get_move(game, next_step) {
     let broker_url = document.getElementById("broker-url").value;
     if (broker_url.length > 0) {
+        let broker_username = document.getElementById("broker-username").value;
+        let broker_password = document.getElementById("broker-password").value;
         console.log("Broker URL: ",broker_url);
-        get_json_data(game, broker_url, next_step);
+        console.log("Broker Username: ", broker_username);
+        // console.log("Broker Password: ", broker_password);
+        get_json_data(game, broker_url, next_step, broker_username, broker_password);
     }
 }
 
-function get_json_data(game, url, next_step) {
+function get_json_data(game, url, next_step, username, password, retries=10) {
     var next_turn = game.moves_played() + 1;
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
+    if (username.length > 0) {
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(username+":"+password));
+    }
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json_reply = JSON.parse(xhr.responseText);
@@ -326,8 +340,13 @@ function get_json_data(game, url, next_step) {
                     console.log("aborting game...")
                     return;
                 }
-                console.log("Broker not ready or invalid data: retry in 500ms");
-                setTimeout(() => get_json_data(game, url, next_step), 500);
+                if (retries > 0) {
+                    console.log("Broker not ready or invalid data: retry in 500ms");
+                    setTimeout(() => get_json_data(game, url, next_step, username, password, retries-1), 500);
+                } else {
+                    console.log("Aborting on broker after too many retries");
+                    document.getElementById("broker-next-move").disabled = false;
+                }
             }
         }
     };
